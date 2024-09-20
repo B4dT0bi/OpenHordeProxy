@@ -79,17 +79,16 @@ pip install -r requirements.txt
 Create a `.env` file in the project root with the following content:
 
 ```env
-AI_HORDE_API_KEY=your_ai_horde_api_key
 HOST=0.0.0.0
 PORT=5000
-DEFAULT_HORDE_MODEL=Deliberate
+DEFAULT_HORDE_MODEL=stable_diffusion
 IMAGE_SAVE_PATH=requested_images
 SERVER_BASE_URL=http://localhost:5000/images/
 LORAS=GlowingRunesAI,AnotherLora:2
 
 # Model mapping from OpenAI models to AI Horde models
-OPENAI_MODEL_MAP_dall_e_2=Deliberate
-OPENAI_MODEL_MAP_dall_e_3=StableDiffusion
+OPENAI_MODEL_MAP_dall_e_2=stable_diffusion
+OPENAI_MODEL_MAP_dall_e_3='SDXL 1.0'
 
 # Additional generation parameters (optional)
 SAMPLER_NAME=k_euler
@@ -156,7 +155,7 @@ Make sure to replace `/path/to/your/image/folder/` with the correct path where t
 You can test the image generation endpoint using the following curl command:
 
 ```bash
-curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: application/json" -d '{
+curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AI_HORDE_API_KEY" -d '{
     "prompt": "A magical forest with glowing trees",
     "n": 1,
     "size": "512x512",

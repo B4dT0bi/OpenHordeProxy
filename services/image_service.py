@@ -1,4 +1,3 @@
-
 from config import Config
 from horde_sdk.ai_horde_api.apimodels import ImageGenerateAsyncRequest, ImageGenerationInputPayload, LorasPayloadEntry
 from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient
@@ -7,11 +6,12 @@ from pathlib import Path
 # Initialize AI Horde Simple Client
 simple_client = AIHordeAPISimpleClient()
 
+
 # Function to parse LoRAs from configuration
 def parse_loras(loras_env):
     if not loras_env:
         return []
-    
+
     loras = []
     for lora_str in loras_env.split(','):
         parts = lora_str.split(':')
@@ -22,6 +22,7 @@ def parse_loras(loras_env):
         loras.append(LorasPayloadEntry(name=name, model=model, clip=clip, inject_trigger=inject_trigger))
     return loras
 
+
 # Validate image dimensions
 def validate_image_size(width, height):
     if not (64 <= width <= 3072) or not (64 <= height <= 3072):
@@ -29,8 +30,9 @@ def validate_image_size(width, height):
     if width % 64 != 0 or height % 64 != 0:
         raise ValueError("Width and height must be divisible by 64.")
 
+
 # Image generation service function
-def generate_image_service(prompt, n, size, model):
+def generate_image_service(prompt, n, size, model, api_key):
     try:
         width, height = map(int, size.split('x'))
     except ValueError:
@@ -52,10 +54,10 @@ def generate_image_service(prompt, n, size, model):
     # Map OpenAI model to AI Horde model
     horde_model = Config.get_horde_model(model)
 
-    # Send image generation request to AI Horde
+    # Send image generation request to AI Horde with the API key from the request
     status_response, job_id = simple_client.image_generate_request(
         ImageGenerateAsyncRequest(
-            apikey=Config.AI_HORDE_API_KEY,
+            apikey=api_key,  # Use the API key provided in the OpenAI request
             params=ImageGenerationInputPayload(
                 sampler_name=sampler_name,
                 cfg_scale=cfg_scale,
