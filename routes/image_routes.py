@@ -1,6 +1,7 @@
 from flask import Blueprint, send_from_directory, jsonify, request
 from config import Config
 from services.image_service import generate_image_service
+from loguru import logger
 
 # Initialize the blueprint for image routes
 image_blueprint = Blueprint('image_routes', __name__)
@@ -37,6 +38,17 @@ def generate_image():
     n = data.get("n", 1)
     size = data.get("size", "512x512")
     model = data.get("model", "dall-e-2")
+
+    # Extract and log the additional parameters
+    quality = data.get("quality", "standard")
+    response_format = data.get("response_format", "url")
+    style = data.get("style", "vivid")
+
+    logger.info(f"Quality: {quality}, Response Format: {response_format}, Style: {style}")
+
+    # If response_format is not "url", return an error
+    if response_format != "url":
+        return jsonify({"error": "Only 'url' response format is supported at this time."}), 400
 
     # Call service function to generate images, passing the API key
     return jsonify(generate_image_service(prompt, n, size, model, api_key))

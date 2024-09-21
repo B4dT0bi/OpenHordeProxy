@@ -2,6 +2,7 @@ from config import Config
 from horde_sdk.ai_horde_api.apimodels import ImageGenerateAsyncRequest, ImageGenerationInputPayload, LorasPayloadEntry
 from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient
 from pathlib import Path
+from loguru import logger
 
 # Initialize AI Horde Simple Client
 simple_client = AIHordeAPISimpleClient()
@@ -90,11 +91,17 @@ def generate_image_service(prompt, n, size, model, api_key):
         image_pil = simple_client.download_image_from_generation(generation)
         image_pil.save(image_path)
 
-        # Determine if internal or external server is used to serve images
-        if Config.ENABLE_IMAGE_SERVER:
-            image_url = f"http://{Config.HOST}:{Config.PORT}/images/{image_name}"
-        else:
+        json_path = example_path / f"{job_id}_generation_{idx + 1}.json"
+        with open(json_path, "w") as f:
+            f.write(generation.model_dump_json(indent=4))
+
+        logger.info(f"Response JSON saved to {json_path}")
+
+        # Determine if SERVER_BASE_URL is provided to override the local server
+        if Config.SERVER_BASE_URL:
             image_url = f"{Config.SERVER_BASE_URL}/{image_name}"
+        else:
+            image_url = f"http://{Config.HOST}:{Config.PORT}/images/{image_name}"
 
         images_data.append({"url": image_url})
 

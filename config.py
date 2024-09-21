@@ -14,7 +14,7 @@ class Config:
     IMAGE_SAVE_PATH = os.getenv('IMAGE_SAVE_PATH', 'requested_images')
 
     # URL for serving images, either internally or externally
-    SERVER_BASE_URL = os.getenv('SERVER_BASE_URL', 'http://localhost:5000/images/')
+    SERVER_BASE_URL = os.getenv('SERVER_BASE_URL', f'http://{HOST}:{PORT}/images/')
 
     # Flag to enable or disable internal image server
     ENABLE_IMAGE_SERVER = os.getenv('ENABLE_IMAGE_SERVER', 'True').lower() == 'true'
