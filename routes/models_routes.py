@@ -9,4 +9,11 @@ models_blueprint = Blueprint('models_routes', __name__)
 def get_available_models():
     model_type = "text"  # Default to text models
     models = asyncio.run(get_models(model_type))
-    return jsonify({"models": models})
+    
+    # Wrap models in the correct format
+    response = {
+        "object": "list",
+        "data": models
+    }
+    
+    return jsonify(response)
