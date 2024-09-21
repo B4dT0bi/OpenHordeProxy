@@ -1,6 +1,8 @@
 
 Flask>=2.0
-horde-sdk>=0.14.5
+horde_sdk~=0.14.5
 python-dotenv>=0.19.2
 Pillow>=8.4.0
 loguru>=0.5.3
+
+aiohttp~=3.10.5

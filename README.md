@@ -14,6 +14,7 @@ chat completions, and AI Horde.
 - Automatic image saving and URL generation with configurable server paths.
 - Flexible model mapping from OpenAI to AI Horde models.
 - Configurable generation parameters like sampler, scale, steps, and more.
+- Fetch available models from AI Horde via the `/v1/models` endpoint.
 
 ## Requirements
 
@@ -222,6 +223,30 @@ Make sure to replace `/path/to/your/image/folder/` with the correct path where t
 }
 ```
 
+### Model Information
+
+- **Endpoint:** `/v1/models`
+- **Method:** `GET`
+
+**Response Format:**
+
+```json
+{
+  "models": [
+    {
+      "name": "koboldcpp/LLaMA2-13B-Psyfighter2",
+      "type": "text",
+      "details": "High-performance text generation model"
+    },
+    {
+      "name": "Deliberate",
+      "type": "image",
+      "details": "A model used for high-quality image generation"
+    }
+  ]
+}
+```
+
 ### Testing with Curl
 
 #### Image Generation
@@ -245,6 +270,12 @@ curl -X POST http://localhost:5000/v1/chat/completions -H "Content-Type: applica
     "temperature": 0.7,
     "top_p": 0.95
 }'
+```
+
+#### Model Information
+
+```bash
+curl -X GET http://localhost:5000/v1/models
 ```
 
 ## License
