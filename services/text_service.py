@@ -1,10 +1,9 @@
 import time
 import uuid
 
-from config import Config
-from horde_sdk.ai_horde_api.apimodels import TextGenerateAsyncRequest, ModelGenerationInputKobold
-from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient
 from horde_sdk import ANON_API_KEY
+from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient
+from horde_sdk.ai_horde_api.apimodels import TextGenerateAsyncRequest, ModelGenerationInputKobold
 
 # Initialize AI Horde Simple Client
 simple_client = AIHordeAPISimpleClient()
@@ -49,11 +48,11 @@ def generate_text_service(messages, model, api_key, max_completion_tokens=None, 
 
     # Create a response following the required structure
     response = {
-        "id": f"chatcmpl-{uuid.uuid4()}",
+        "id": f"chatcmpl-{str(uuid.uuid4())[:4]}",
         "object": "chat.completion",
         "created": int(time.time()),
         "model": model,
-        "system_fingerprint": f"fp_{uuid.uuid4().hex[:12]}",
+        "system_fingerprint": f"fp_{status_response.generations[0].worker_id}",
         "choices": [
             {
                 "index": 0,
@@ -61,7 +60,6 @@ def generate_text_service(messages, model, api_key, max_completion_tokens=None, 
                     "role": "assistant",
                     "content": generated_text
                 },
-                "logprobs": None,
                 "finish_reason": "stop"
             }
         ],
