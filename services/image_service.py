@@ -1,6 +1,7 @@
+
 from config import Config
 from horde_sdk.ai_horde_api.apimodels import ImageGenerateAsyncRequest, ImageGenerationInputPayload, LorasPayloadEntry
-from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient
+from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient, ANON_API_KEY
 from pathlib import Path
 from loguru import logger
 
@@ -12,7 +13,7 @@ simple_client = AIHordeAPISimpleClient()
 def parse_loras(loras_env):
     if not loras_env:
         return []
-
+    
     loras = []
     for lora_str in loras_env.split(','):
         parts = lora_str.split(':')
@@ -55,10 +56,13 @@ def generate_image_service(prompt, n, size, model, api_key):
     # Map OpenAI model to AI Horde model
     horde_model = Config.get_horde_model(model)
 
-    # Send image generation request to AI Horde with the API key from the request
+    # If api_key is None, use ANON_API_KEY
+    effective_api_key = api_key if api_key else ANON_API_KEY
+
+    # Send image generation request to AI Horde with the appropriate API key
     status_response, job_id = simple_client.image_generate_request(
         ImageGenerateAsyncRequest(
-            apikey=api_key,  # Use the API key provided in the OpenAI request
+            apikey=effective_api_key,  # Use the API key provided in the OpenAI request, or ANON_API_KEY if None
             params=ImageGenerationInputPayload(
                 sampler_name=sampler_name,
                 cfg_scale=cfg_scale,

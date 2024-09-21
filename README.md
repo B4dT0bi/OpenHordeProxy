@@ -79,6 +79,7 @@ pip install -r requirements.txt
 Create a `.env` file in the project root with the following content:
 
 ```env
+AI_HORDE_API_KEY=your_ai_horde_api_key
 HOST=0.0.0.0
 PORT=5000
 DEFAULT_HORDE_MODEL=stable_diffusion
@@ -89,6 +90,9 @@ LORAS=GlowingRunesAI,AnotherLora:2
 # Model mapping from OpenAI models to AI Horde models
 OPENAI_MODEL_MAP_dall_e_2=stable_diffusion
 OPENAI_MODEL_MAP_dall_e_3='SDXL 1.0'
+
+# Enable or disable anonymous access (set to True to allow anonymous requests without an API key)
+ALLOW_ANONYMOUS_ACCESS=False
 
 # Additional generation parameters (optional)
 SAMPLER_NAME=k_euler
@@ -155,7 +159,18 @@ Make sure to replace `/path/to/your/image/folder/` with the correct path where t
 You can test the image generation endpoint using the following curl command:
 
 ```bash
-curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_AI_HORDE_API_KEY" -d '{
+curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_OPENAI_API_KEY" -d '{
+    "prompt": "A magical forest with glowing trees",
+    "n": 1,
+    "size": "512x512",
+    "model": "dall-e-2"
+}'
+```
+
+If **anonymous access** is allowed, you can omit the `Authorization` header:
+
+```bash
+curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: application/json" -d '{
     "prompt": "A magical forest with glowing trees",
     "n": 1,
     "size": "512x512",

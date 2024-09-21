@@ -29,6 +29,9 @@ class Config:
     STEPS = int(os.getenv('STEPS', 30))
     HIRES_FIX = os.getenv('HIRES_FIX', 'False').lower() == 'true'
 
+    # Anonymous access configuration
+    ALLOW_ANONYMOUS_ACCESS = os.getenv('ALLOW_ANONYMOUS_ACCESS', 'False').lower() == 'true'
+
     # Method to map OpenAI models to AI Horde models
     @staticmethod
     def get_horde_model(openai_model: str) -> str:
