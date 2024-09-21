@@ -1,12 +1,13 @@
 # OpenHordeProxy
 
-OpenHordeProxy is a Python-based proxy tool that converts OpenAI image generation requests into requests for AI Horde,
-using a Flask API. This tool allows developers to seamlessly switch between OpenAI's image generation models and AI
-Horde, offering a flexible and scalable image generation service.
+OpenHordeProxy is a Python-based proxy tool that converts OpenAI image and text generation requests into requests for AI
+Horde, using a Flask API. This tool allows developers to seamlessly switch between OpenAI's image generation models,
+chat completions, and AI Horde.
 
 ## Features
 
 - Proxy OpenAI requests to AI Horde via Flask API.
+- Text generation through the AI Horde text models.
 - Easy configuration using environment variables.
 - Integrated with AI Horde SDK.
 - Supports LoRA models for fine-tuning image generation.
@@ -154,9 +155,76 @@ server {
 
 Make sure to replace `/path/to/your/image/folder/` with the correct path where the images are stored.
 
-## Testing with Curl
+## API Endpoints
 
-You can test the image generation endpoint using the following curl command:
+### Image Generation
+
+- **Endpoint:** `/v1/images/generations`
+- **Method:** `POST`
+
+**Request Format:**
+
+```json
+{
+  "prompt": "A futuristic cityscape with flying cars",
+  "n": 2,
+  "size": "512x512",
+  "model": "dall-e-2"
+}
+```
+
+**Response Format:**
+
+```json
+{
+  "data": [
+    {
+      "url": "http://localhost:5000/images/jobid_generation_1.webp"
+    },
+    {
+      "url": "http://localhost:5000/images/jobid_generation_2.webp"
+    }
+  ]
+}
+```
+
+### Text Generation (Chat Completion)
+
+- **Endpoint:** `/v1/chat/completions`
+- **Method:** `POST`
+
+**Request Format:**
+
+```json
+{
+  "model": "koboldcpp/LLaMA2-13B-Psyfighter2",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What is the meaning of life?"
+    }
+  ],
+  "max_completion_tokens": 100,
+  "temperature": 0.7,
+  "top_p": 0.95
+}
+```
+
+**Response Format:**
+
+```json
+{
+  "choices": [
+    {
+      "text": "The meaning of life is subjective and depends on the individual."
+    }
+  ]
+}
+```
+
+### Testing with Curl
+
+#### Image Generation
 
 ```bash
 curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_OPENAI_API_KEY" -d '{
@@ -167,14 +235,15 @@ curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: appli
 }'
 ```
 
-If **anonymous access** is allowed, you can omit the `Authorization` header:
+#### Text Generation (Chat Completion)
 
 ```bash
-curl -X POST http://localhost:5000/v1/images/generations -H "Content-Type: application/json" -d '{
-    "prompt": "A magical forest with glowing trees",
-    "n": 1,
-    "size": "512x512",
-    "model": "dall-e-2"
+curl -X POST http://localhost:5000/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_OPENAI_API_KEY" -d '{
+    "model": "koboldcpp/LLaMA2-13B-Psyfighter2",
+    "messages": [{"role": "user", "content": "What is the meaning of life?"}],
+    "max_completion_tokens": 100,
+    "temperature": 0.7,
+    "top_p": 0.95
 }'
 ```
 
