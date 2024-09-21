@@ -1,6 +1,7 @@
 from config import Config
 from horde_sdk.ai_horde_api.apimodels import ImageGenerateAsyncRequest, ImageGenerationInputPayload, LorasPayloadEntry
-from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient, ANON_API_KEY
+from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient
+from horde_sdk import ANON_API_KEY
 from pathlib import Path
 import base64
 
