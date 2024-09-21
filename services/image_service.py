@@ -1,9 +1,8 @@
-
 from config import Config
 from horde_sdk.ai_horde_api.apimodels import ImageGenerateAsyncRequest, ImageGenerationInputPayload, LorasPayloadEntry
 from horde_sdk.ai_horde_api.ai_horde_clients import AIHordeAPISimpleClient, ANON_API_KEY
 from pathlib import Path
-from loguru import logger
+import base64
 
 # Initialize AI Horde Simple Client
 simple_client = AIHordeAPISimpleClient()
@@ -13,7 +12,7 @@ simple_client = AIHordeAPISimpleClient()
 def parse_loras(loras_env):
     if not loras_env:
         return []
-    
+
     loras = []
     for lora_str in loras_env.split(','):
         parts = lora_str.split(':')
@@ -34,7 +33,7 @@ def validate_image_size(width, height):
 
 
 # Image generation service function
-def generate_image_service(prompt, n, size, model, api_key):
+def generate_image_service(prompt, n, size, model, api_key, response_format="url"):
     try:
         width, height = map(int, size.split('x'))
     except ValueError:
@@ -95,18 +94,17 @@ def generate_image_service(prompt, n, size, model, api_key):
         image_pil = simple_client.download_image_from_generation(generation)
         image_pil.save(image_path)
 
-        json_path = example_path / f"{job_id}_generation_{idx + 1}.json"
-        with open(json_path, "w") as f:
-            f.write(generation.model_dump_json(indent=4))
-
-        logger.info(f"Response JSON saved to {json_path}")
-
-        # Determine if SERVER_BASE_URL is provided to override the local server
-        if Config.SERVER_BASE_URL:
-            image_url = f"{Config.SERVER_BASE_URL}/{image_name}"
+        # Return image as base64 encoded string if response_format is 'b64_json'
+        if response_format == 'b64_json':
+            with open(image_path, "rb") as image_file:
+                b64_image = base64.b64encode(image_file.read()).decode('utf-8')
+                images_data.append({"b64_json": b64_image})
         else:
-            image_url = f"http://{Config.HOST}:{Config.PORT}/images/{image_name}"
-
-        images_data.append({"url": image_url})
+            # Determine if SERVER_BASE_URL is provided to override the local server
+            if Config.SERVER_BASE_URL:
+                image_url = f"{Config.SERVER_BASE_URL}/{image_name}"
+            else:
+                image_url = f"http://{Config.HOST}:{Config.PORT}/images/{image_name}"
+            images_data.append({"url": image_url})
 
     return {"data": images_data}

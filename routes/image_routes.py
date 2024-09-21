@@ -1,4 +1,3 @@
-
 from flask import Blueprint, send_from_directory, jsonify, request
 from config import Config
 from services.image_service import generate_image_service
@@ -41,7 +40,7 @@ def generate_image():
     n = data.get("n", 1)
     size = data.get("size", "512x512")
     model = data.get("model", "dall-e-2")
-    
+
     # Extract and log the additional parameters
     quality = data.get("quality", "standard")
     response_format = data.get("response_format", "url")
@@ -49,9 +48,9 @@ def generate_image():
 
     logger.info(f"Quality: {quality}, Response Format: {response_format}, Style: {style}")
 
-    # If response_format is not "url", return an error
-    if response_format != "url":
-        return jsonify({"error": "Only 'url' response format is supported at this time."}), 400
+    # If response_format is not "url" or "b64_json", return an error
+    if response_format not in ["url", "b64_json"]:
+        return jsonify({"error": "Only 'url' and 'b64_json' response formats are supported at this time."}), 400
 
-    # Call service function to generate images, passing the API key (or None if anonymous access is allowed)
-    return jsonify(generate_image_service(prompt, n, size, model, api_key))
+    # Call service function to generate images, passing the API key and response format
+    return jsonify(generate_image_service(prompt, n, size, model, api_key, response_format))
